@@ -5,6 +5,7 @@
 		"importHelpers": true,
 		"declaration": true,
 		"declarationMap": true,
+		"downlevelIteration": true,
 		"sourceMap": true,
 		"strict": true,
 		"noUnusedLocals": true,
