@@ -10,25 +10,27 @@ import {
   Provider,
   createContainer,
   useStaticModel,
-  useLocalModel
+  useLocalModel,
+	defineModel
 } from '..';
 
-const countModel = {
-  name: 'countModel',
-  state: {
-    value: 1
-  },
-  reducers: {
-    add(state: { value: number }) {
-      return {
-        ...state,
-        value: state.value + 1
-      };
-    }
-  }
-};
+const countModel = defineModel({
+	name: 'countModel',
+	state: {
+		value: 1
+	},
+	reducers: {
+		add(state: { value: number }) {
+			return {
+				...state,
+				value: state.value + 1
+			};
+		}
+	}
+});
 
 const App = () => {
+	// @ts-ignore
   const [state, dispatch] = useModel(countModel);
 
   return (
@@ -84,7 +86,8 @@ describe('test createGlobalStore', () => {
     );
 
     const SubApp = () => {
-      const [state, dispatch] = useLModel(countModel);
+			// @ts-ignore
+			const [state, dispatch] = useLModel(countModel);
 
       return (
         <>
@@ -176,8 +179,10 @@ describe('test createGlobalStore', () => {
 
   it('useLocalModel should work', () => {
     function Container() {
-      const [state, dispatch] = useLocalModel(countModel);
-      const [state1, dispatch1] = useLocalModel(countModel);
+			// @ts-ignore
+			const [state, dispatch] = useLocalModel(countModel);
+			// @ts-ignore
+			const [state1, dispatch1] = useLocalModel(countModel);
 
       return (
         <div>

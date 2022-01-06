@@ -89,7 +89,7 @@ export interface NamedModel<
 	TBaseState = TState
 > extends Model<TModels, TState, TBaseState> {
 	name: string
-	reducers: ModelReducers<TState>
+	reducers: ModelReducers<TState>,
 }
 
 export interface Model<
@@ -101,7 +101,8 @@ export interface Model<
 	state: TState
 	reducers?: ModelReducers<TState>
 	baseReducer?: ReduxReducer<TBaseState>
-	effects?: ModelEffects<TModels> | ModelEffectsCreator<TModels>
+	effects?: ModelEffects<TModels> | ModelEffectsCreator<TModels>,
+	subscribe?: (payload: Action)=>any
 }
 
 export type ModelReducers<TState = any> = {
@@ -110,6 +111,10 @@ export type ModelReducers<TState = any> = {
 
 export interface ModelEffects<TModels extends Models<TModels>> {
 	[key: string]: ModelEffect<TModels>
+}
+
+export interface ModelSubscribes<TModels extends Models<TModels>> {
+	[key: string]: ModelSubscribe<TModels>
 }
 
 export type ModelEffectThisTyped = {
@@ -121,6 +126,10 @@ export type ModelEffect<TModels extends Models<TModels>> = (
 	payload: Action['payload'],
 	rootState: RematchRootState<TModels>,
 	meta: Action['meta']
+) => any
+
+export type ModelSubscribe<TModels extends Models<TModels>> = (
+	payload: Action,
 ) => any
 
 export type ModelEffectsCreator<TModels extends Models<TModels>> = (
@@ -230,6 +239,7 @@ export interface RematchBag<
 		fn: (content: NonNullable<PluginHooks<TModels, TExtraModels>[Hook]>) => void
 	) => void
 	effects: ModelEffects<TModels>
+	subscribes: ModelSubscribes<TModels>
 }
 
 /**

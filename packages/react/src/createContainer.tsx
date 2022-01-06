@@ -59,16 +59,14 @@ function initModel(
       });
     }
     (
-      model as INamedModel<any> & { _subscriptions: Record<string, () => void> }
-    )._subscriptions = {
-      [`${name}/*`]: () => {
-        batchManager.triggerSubsribe(name); // render self;
-        const _beDepends = [...(model._beDepends || [])];
-        _beDepends.forEach(beDepend => {
-          batchManager.triggerSubsribe(beDepend); // render deDepend;
-        });
-      }
-    };
+      model as INamedModel<any>
+    ).subscribe = function(){
+			batchManager.triggerSubsribe(name); // render self;
+			const _beDepends = [...(model._beDepends || [])];
+			_beDepends.forEach(beDepend => {
+				batchManager.triggerSubsribe(beDepend); // render deDepend;
+			});
+		};
     viewsManager.addView(model as any);
     store.addModel(model);
     batchManager.addSubsribe(name);

@@ -5,14 +5,15 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { act } from 'react-dom/test-utils';
-import { useModel, Provider } from '..';
-import { model } from '../news'
-const countModel = model('countModel').define({
+import { useModel, Provider, defineModel } from '..';
+
+const countModel = defineModel({
+	name: 'countModel',
   state: {
     value: 1,
     value1: 1
   },
-  actions: {
+	reducers: {
     addValue(state) {
       return {
         ...state,
@@ -39,6 +40,7 @@ describe('test batch', () => {
     document.body.removeChild(node);
     (node as unknown as null) = null;
   });
+
   test('once store change, update should batch in one render', () => {
     let renderCount = 0;
 

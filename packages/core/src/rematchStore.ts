@@ -17,6 +17,7 @@ import createReduxStore, {
 	createRootReducer,
 } from './reduxStore'
 import { createReducerDispatcher, createEffectDispatcher } from './dispatcher'
+import { createSubscribes } from './subscribes'
 import { validateModel } from './validate'
 import createRematchBag from './bag'
 
@@ -26,6 +27,9 @@ export default function createRematchStore<
 >(config: Config<TModels, TExtraModels>): RematchStore<TModels, TExtraModels> {
 	// setup rematch 'bag' for storing useful values and functions
 	const bag = createRematchBag(config)
+
+	// add middleware for handling subscribes
+	bag.reduxConfig.middlewares.push(createSubscribesMiddleware(bag))
 
 	// add middleware for handling effects
 	bag.reduxConfig.middlewares.push(createEffectsMiddleware(bag))
@@ -67,6 +71,25 @@ export default function createRematchStore<
 	})
 
 	return rematchStore
+}
+
+
+function createSubscribesMiddleware<
+	TModels extends Models<TModels>,
+	TExtraModels extends Models<TModels>
+	>(bag: RematchBag<TModels, TExtraModels>): Middleware {
+	return (_store) =>
+		(next) =>
+			(action: Action): any => {
+				const res = next(action);
+				const { type } = action;
+				const modelName = type.split('/')[0];
+				const subscribe = bag.subscribes[modelName];
+				if(typeof subscribe === 'function'){
+					subscribe(action)
+				}
+				return res;
+			}
 }
 
 function createEffectsMiddleware<
@@ -115,6 +138,7 @@ function enhanceModel<
 	bag: RematchBag<TModels, TExtraModels>,
 	model: TModel
 ): void {
+	createSubscribes(rematchStore, bag, model)
 	createEffectDispatcher(rematchStore, bag, model)
 
 	bag.forEachPlugin('onModel', (onModel) => {
