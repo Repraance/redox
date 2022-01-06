@@ -1,4 +1,4 @@
-import { Action, Model, Plugin, Models } from '../../..';
+import { Action, Model, Plugin, Models } from '../../../types';
 import { createSubscription } from './create';
 import { createUnsubscribe } from './unsubscribe';
 import { IMatched, IMatchedMap } from './types';
@@ -45,8 +45,8 @@ const subscriptionsPlugin = <
           );
       });
     },
-    createMiddleware() {
-      return () => (next: (action: Action) => any) => (action: Action) => {
+    createMiddleware(rematchBag) {
+      return store => (next: (action: Action) => any) => (action: Action) => {
         const { type } = action;
         next(action);
         // exact match
@@ -55,7 +55,7 @@ const subscriptionsPlugin = <
           // call each hook[modelName] with action
           allMatches && triggerAllSubscriptions(allMatches)(type);
         } else {
-          patternSubscriptions.forEach((_handler: object, matcher: string) => {
+          patternSubscriptions.forEach((handler: object, matcher: string) => {
             if (type.match(new RegExp(matcher))) {
               const patternMatches = patternSubscriptions.get(matcher);
               patternMatches &&

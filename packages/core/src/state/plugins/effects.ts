@@ -1,4 +1,4 @@
-import { Plugin, Models } from '../rematch'
+import { Plugin, Models } from '../../types'
 
 const effectsPlugin = <
   TModels extends Models<TModels>,
