@@ -1,5 +1,5 @@
 import { Middleware } from 'redux'
-import { init, ModelDispatcher, Models } from '../src'
+import { createModel, init, ModelDispatcher, Models } from '../src'
 
 describe('effects:', () => {
 	test('should create an action', () => {
@@ -41,27 +41,57 @@ describe('effects:', () => {
 	})
 
 	test('second param should contain state', async () => {
-		let secondParam = 0
+		let secondParam: any
 
-		const count = {
+		interface RootModel extends Models<RootModel> {
+			count: typeof count
+		}
+		const count = createModel<RootModel>()({
+			name: 'count',
 			state: 7,
 			reducers: {
 				add: (s: number, p: number): number => s + p,
 			},
 			effects: {
-				makeCall(_: number, state: any): void {
+				makeCall(_: number, state: number): void {
 					secondParam = state
 				},
 			},
-		}
+		})
 
 		const store = init({
-			models: { count },
+			models: { count } as RootModel,
 		})
 
 		store.dispatch.count.makeCall(2)
 
-		expect(secondParam).toEqual({ count: 7 })
+		expect(secondParam).toBe(7)
+	})
+
+	test('third param should contain rootState', async () => {
+		let thirdParam: any
+
+		interface RootModel extends Models<RootModel> {
+			count: typeof count
+		}
+		const count = createModel<RootModel>()({
+			name: 'count',
+			state: 7,
+			reducers: {
+				add: (s: number, p: number): number => s + p,
+			},
+			effects: {
+				makeCall(_: void, _state, rootState): void {
+					thirdParam = rootState
+				},
+			},
+		})
+
+		const store = init({
+			models: { count } as RootModel,
+		})
+		store.dispatch.count.makeCall()
+		expect(thirdParam).toEqual({ count: 7 })
 	})
 
 	test('should create an effect dynamically', () => {
@@ -406,7 +436,7 @@ describe('effects:', () => {
 			},
 			effects: (dispatch) => ({
 				addOneAsync(): void {
-					dispatch.count.addOne()
+					dispatch.addOne()
 				},
 			}),
 		}
@@ -462,7 +492,7 @@ describe('effects:', () => {
 				},
 				effects: (dispatch) => ({
 					async asyncAddOneArrow(): Promise<void> {
-						await dispatch.example.addOne()
+						await dispatch.addOne()
 					},
 				}),
 			}
@@ -476,6 +506,92 @@ describe('effects:', () => {
 			expect(store.getState()).toEqual({
 				example: 1,
 			})
+		})
+
+		it('should pass rootDispatch in as a function', async () => {
+			type CountState = number
+
+			interface RootModel extends Models<RootModel> {
+				example: typeof example
+			}
+
+			const example = createModel<RootModel>()({
+				name: 'example',
+				state: 0,
+				reducers: {
+					addOne: (state: CountState): CountState => state + 1,
+				},
+				effects: (_: any, rootDispatch) => ({
+					async asyncAddOneArrow(): Promise<void> {
+						await rootDispatch.example.addOne()
+					},
+				}),
+			})
+
+			const store = init({
+				models: { example } as RootModel,
+			})
+
+			await store.dispatch.example.asyncAddOneArrow()
+
+			expect(store.getState()).toEqual({
+				example: 1,
+			})
+		})
+		it('first param should be payload', async () => {
+			let value = 1
+
+			interface RootModel extends Models<RootModel> {
+				count: typeof count
+			}
+			const count = createModel<RootModel>()({
+				name: 'count',
+				state: 7,
+				reducers: {
+					add: (s: number, p: number): number => s + p,
+				},
+				effects: () => ({
+					add: (payload: number) => {
+						value += payload
+					}
+				}),
+			})
+
+			const store = init({
+				models: { count } as RootModel,
+			})
+
+			store.dispatch({ type: 'count/add', payload: 4 })
+
+			expect(value).toBe(5)
+		})
+
+		it('second param should contain state', async () => {
+			let secondParam: any
+
+			interface RootModel extends Models<RootModel> {
+				count: typeof count
+			}
+			const count = createModel<RootModel>()({
+				name: 'count',
+				state: 7,
+				reducers: {
+					add: (s: number, p: number): number => s + p,
+				},
+				effects: () => ({
+					makeCall(_: void, state): void {
+						secondParam = state
+					},
+				}),
+			})
+
+			const store = init({
+				models: { count } as RootModel,
+			})
+
+			store.dispatch.count.makeCall()
+
+			expect(secondParam).toBe(7)
 		})
 	})
 })

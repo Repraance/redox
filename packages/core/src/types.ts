@@ -122,9 +122,14 @@ export type ModelEffectThisTyped = {
 	[key: string]: (payload?: any, meta?: any) => Action<any, any>
 }
 
+export type ModelEffectThisDispatcher = {
+	[key: string]: (payload?: any, meta?: any) => Action<any, any>
+}
+
 export type ModelEffect<TModels extends Models<TModels>> = (
-	this: ModelEffectThisTyped,
+	// this: ModelEffectThisTyped,
 	payload: Action['payload'],
+	state: any,
 	rootState: RematchRootState<TModels>,
 	meta: Action['meta']
 ) => any
@@ -134,7 +139,8 @@ export type ModelSubscribe<TModels extends Models<TModels>> = (
 ) => any
 
 export type ModelEffectsCreator<TModels extends Models<TModels>> = (
-	dispatch: RematchDispatch<TModels>
+	dispatch: ModelEffectThisDispatcher,
+	rootDispatch: RematchDispatch<TModels>
 ) => ModelEffects<TModels>
 
 /** ************************** Plugin *************************** */
@@ -551,7 +557,7 @@ type ExtractParameterFromEffect<
 	V extends 'payload' | 'meta'
 > = P extends []
 	? never
-	: P extends [p?: infer TPayload, s?: unknown]
+	: P extends [p?: infer TPayload, s?: unknown, r?: unknown]
 	? V extends 'payload'
 		? P extends [infer TPayloadMayUndefined, ...unknown[]]
 			? [p: TPayloadMayUndefined]
@@ -560,6 +566,7 @@ type ExtractParameterFromEffect<
 	: P extends [
 			p?: infer TPayload,
 			s?: unknown,
+			r?: unknown,
 			m?: infer TMeta,
 			...args: unknown[]
 	  ]
@@ -567,7 +574,7 @@ type ExtractParameterFromEffect<
 		? P extends [infer TPayloadMayUndefined, ...unknown[]]
 			? [p: TPayloadMayUndefined]
 			: [p?: TPayload]
-		: P extends [unknown, unknown, infer TMetaMayUndefined, ...unknown[]]
+		: P extends [unknown, unknown, unknown, infer TMetaMayUndefined, ...unknown[]]
 		? [m: TMetaMayUndefined]
 		: [m?: TMeta]
 	: never
@@ -596,6 +603,13 @@ export type ExtractRematchDispatcherFromEffect<
 				TReturn
 		  >
 		: TRest[2] extends undefined
+		? RematchDispatcher<
+				true,
+				ExtractParameterFromEffect<TRest, 'payload'>,
+				never,
+				TReturn
+		  >
+		: TRest[3] extends undefined
 		? RematchDispatcher<
 				true,
 				ExtractParameterFromEffect<TRest, 'payload'>,

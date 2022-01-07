@@ -316,11 +316,36 @@ describe('Dispatcher typings', () => {
 			dispatch.count.incrementEffect(2)
 		})
 
-		it('optional payload and accessing rootState', () => {
+		it('optional payload and accessing state', () => {
 			const count = createModel<RootModel>()({
 				state: 0, // initial state
 				effects: () => ({
 					incrementEffect(payload?: number, rootState?): number | undefined {
+						if (rootState.count) {
+							// do nothing
+						}
+						return payload
+					},
+				}),
+			})
+			interface RootModel extends Models<RootModel> {
+				count: typeof count
+			}
+
+			const store = init<RootModel>({ models: { count } })
+			const { dispatch } = store
+
+			dispatch.count.incrementEffect(2)
+			dispatch.count.incrementEffect()
+			// @ts-expect-error
+			dispatch.count.incrementEffect('test', { prueba: 'hola ' })
+		})
+
+		it('optional payload and accessing rootState', () => {
+			const count = createModel<RootModel>()({
+				state: 0, // initial state
+				effects: () => ({
+					incrementEffect(payload?: number, _state?, rootState?): number | undefined {
 						if (rootState.count) {
 							// do nothing
 						}
@@ -346,17 +371,19 @@ describe('Dispatcher typings', () => {
 				state: 0,
 				effects: {
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
-					incWithRequiredMeta(_payload: number, _rootState, _meta: string) {},
+					incWithRequiredMeta(_payload: number, _state, _rootState, _meta: string) {},
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
-					incWithOptionalMeta(_payload: number, _rootState, _meta?: string) {},
+					incWithOptionalMeta(_payload: number, _state, _rootState, _meta?: string) {},
 					incWithOptionalMetaAndOptionalPayload(
 						_payload?: number,
+						_state?,
 						_rootState?,
 						_meta?: string
 						// eslint-disable-next-line @typescript-eslint/no-empty-function
 					) {},
 					incWithMetaMaybeUndefined(
 						_payload: number,
+						_state,
 						_rootState,
 						_meta: string | undefined
 						// eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -461,7 +488,7 @@ describe('Dispatcher typings', () => {
 			effects: (dispatch) => ({
 				increment(_: number, state) {
 					if (state.count < 5) {
-						dispatch.count.increment(1)
+						dispatch.increment(1)
 					}
 				},
 			}),

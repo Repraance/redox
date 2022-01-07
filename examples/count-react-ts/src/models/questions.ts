@@ -21,10 +21,10 @@ const questions = createModel<RootModel>()({
 	},
 	effects: (dispatch) => ({
 		async loadQuestions({ categoryId }: { categoryId: string }) {
-			dispatch.questions.setQuestions([1, 2])
+			dispatch.setQuestions([1, 2])
 		},
 		async otherLoadQuestion() {
-			dispatch.questions.loadQuestions({ categoryId: '1' })
+			dispatch.loadQuestions({ categoryId: '1' })
 		},
 	}),
 })
