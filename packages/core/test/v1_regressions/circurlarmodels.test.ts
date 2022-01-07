@@ -1,13 +1,13 @@
-import { init } from '../../src'
+import { init, createModel } from '../../src'
 
 it('circular models should destruct properly', async () => {
 	type CountState = number
-	const dolphins = {
+	const dolphins = createModel()({
 		state: 0,
 		reducers: {
 			increment: (state: CountState) => state + 1,
 		},
-		effects: ({ sharks, dolphins }: any) => {
+		effects: (_, { sharks, dolphins }: any) => {
 			return {
 				async incrementAsync(): Promise<void> {
 					dolphins.increment()
@@ -17,19 +17,19 @@ it('circular models should destruct properly', async () => {
 				},
 			}
 		},
-	}
-	const sharks = {
+	})
+	const sharks = createModel()({
 		state: 0,
 		reducers: {
 			increment: (state: CountState, payload: number) => state + payload,
 		},
-		effects: ({ dolphins, sharks }: any) => ({
+		effects: (_, { dolphins, sharks }: any) => ({
 			async incrementAsync(payload: number): Promise<void> {
 				dolphins.increment()
 				sharks.increment(payload)
 			},
 		}),
-	}
+	})
 
 	const store = init({
 		models: { dolphins, sharks },

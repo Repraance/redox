@@ -93,7 +93,7 @@ export const createEffectDispatcher = <
 	if (model.effects) {
 		effects =
 			typeof model.effects === 'function'
-				? (model.effects as ModelEffectsCreator<TModels>)(rematch.dispatch)
+				? (model.effects as ModelEffectsCreator<TModels>)(modelDispatcher, rematch.dispatch)
 				: model.effects
 	}
 

@@ -24,16 +24,13 @@ describe('circular references', () => {
 				},
 			}),
 		})
-		// @ts-expect-error
 		const otherModel = createModel<RootModel>()({
 			state: {
 				ids: {},
 			} as ComplexType,
 			effects: () => ({
 				async b(payload: { name: string }, rootState) {
-					// @ts-expect-error
 					const { otherModel } = rootState
-					// @ts-expect-error
 					const id = otherModel.ids[payload.name]
 					return id
 				},
@@ -42,7 +39,6 @@ describe('circular references', () => {
 
 		interface RootModel extends Models<RootModel> {
 			myModel: typeof model
-			// @ts-expect-error
 			otherModel: typeof otherModel
 		}
 	})

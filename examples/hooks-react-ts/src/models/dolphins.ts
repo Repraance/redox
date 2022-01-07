@@ -8,7 +8,7 @@ export const dolphins = createModel<RootModel>()({
 		// eslint-disable-next-line @typescript-eslint/no-inferrable-types
 		increment: (state, payload: number = 1) => state + payload,
 	},
-	effects: (dispatch) => ({
+	effects: (_, dispatch) => ({
 		async incrementAsync() {
 			await delay(500)
 			dispatch.dolphins.increment()

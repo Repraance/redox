@@ -12,7 +12,7 @@ export const sharks = createModel<RootModel>()({
 	effects: (dispatch) => ({
 		async incrementAsync(payload: number): Promise<void> {
 			await delay(500)
-			dispatch.sharks.increment(payload)
+			dispatch.increment(payload)
 		},
 	}),
 })

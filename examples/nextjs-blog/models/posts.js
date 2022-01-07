@@ -32,7 +32,7 @@ export const posts = {
 	},
 	effects: (dispatch) => ({
 		duplicatePost() {
-			dispatch.posts.setPosts(POST_TEMPLATE)
+			dispatch.setPosts(POST_TEMPLATE)
 		},
 	}),
 }

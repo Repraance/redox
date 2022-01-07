@@ -159,25 +159,5 @@ export const defineModel = <
   if (!finalModel._beDepends) {
     finalModel._beDepends = new Set();
   }
-  const { effects } = finalModel;
-  if (finalModel.effects) {
-    for (const effectName in effects) {
-      const effectFunction = effects[effectName];
-      // @ts-ignore
-      finalModel.effects[effectName] = (
-        payload,
-        // @ts-ignore
-        { state, dispatch, rootState, rootDispatch }
-      ) => {
-        return effectFunction(
-          payload,
-          state,
-          dispatch,
-          rootState,
-          rootDispatch
-        );
-      };
-    }
-  }
   return finalModel;
 };
