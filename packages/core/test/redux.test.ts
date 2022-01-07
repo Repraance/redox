@@ -73,7 +73,7 @@ describe('redux:', () => {
 					},
 					reducers: {},
 					baseReducer: libReducer,
-					effects: (dispatch: Dispatch) => ({
+					effects: (_: unknown, dispatch: Dispatch) => ({
 						dinner(): void {
 							dispatch({ type: libAction, payload: 'winner' })
 						},

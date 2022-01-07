@@ -104,11 +104,12 @@ function createEffectsMiddleware<
 			if (action.type in bag.effects) {
 				// first run reducer action if exists
 				next(action)
-
+				const modelName = action.type.split('/')[0]
 				// then run the effect and return its result
 				return (bag.effects as any)[action.type](
 					action.payload,
-					store.getState(),
+					store.getState()[modelName], 	// selfState
+					store.getState(), 						// rootState
 					action.meta
 				)
 			}
