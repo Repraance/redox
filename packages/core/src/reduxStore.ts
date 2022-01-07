@@ -1,4 +1,5 @@
 import * as Redux from 'redux'
+import produce from 'immer'
 import {
 	Action,
 	ConfigRedux,
@@ -41,6 +42,13 @@ export default function createReduxStore<
 		initialState,
 		enhancers
 	)
+}
+
+function wrapReducerWithImmer(reducer: Redux.Reducer) {
+	return (state: any, payload: any): any => {
+		if (state === undefined) return reducer(state, payload)
+		return produce(state, (draft: any) => reducer(draft, payload))
+	}
 }
 
 /**
@@ -97,6 +105,8 @@ export function createModelReducer<
 		? combinedReducer
 		: (state: TState = model.state, action: Action): TState =>
 				combinedReducer(modelBaseReducer(state, action), action)
+
+	reducer = wrapReducerWithImmer(reducer)
 
 	bag.forEachPlugin('onReducer', (onReducer) => {
 		reducer = onReducer(reducer, model.name, bag) || reducer

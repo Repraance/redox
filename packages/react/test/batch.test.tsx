@@ -5,7 +5,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { act } from 'react-dom/test-utils';
-import { useModel, Provider, defineModel } from '..';
+import { useModel, Provider, defineModel } from '../src';
 
 const countModel = defineModel({
 	name: 'countModel',

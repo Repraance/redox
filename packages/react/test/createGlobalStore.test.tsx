@@ -12,7 +12,7 @@ import {
   useStaticModel,
   useLocalModel,
 	defineModel
-} from '..';
+} from '../src';
 
 const countModel = defineModel({
 	name: 'countModel',
