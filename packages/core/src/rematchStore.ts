@@ -18,6 +18,7 @@ import createReduxStore, {
 } from './reduxStore'
 import { createReducerDispatcher, createEffectDispatcher } from './dispatcher'
 import { createSubscribes } from './subscribes'
+import { createViews } from './views'
 import { validateModel } from './validate'
 import createRematchBag from './bag'
 
@@ -52,6 +53,7 @@ export default function createRematchStore<
 			reduxStore.replaceReducer(createRootReducer(bag))
 			reduxStore.dispatch({ type: '@@redux/REPLACE' })
 		},
+		views: {}
 	} as RematchStore<TModels, TExtraModels>
 
 	addExposed(rematchStore, config.plugins)
@@ -139,6 +141,7 @@ function enhanceModel<
 	model: TModel
 ): void {
 	createSubscribes(rematchStore, bag, model)
+	createViews(rematchStore, bag, model)
 	createEffectDispatcher(rematchStore, bag, model)
 
 	bag.forEachPlugin('onModel', (onModel) => {

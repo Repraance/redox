@@ -103,6 +103,7 @@ export interface Model<
 	baseReducer?: ReduxReducer<TBaseState>
 	effects?: ModelEffects<TModels> | ModelEffectsCreator<TModels>,
 	subscribe?: (payload: Action)=>any
+	views?: Record<string, (...args: any)=>any>
 }
 
 export type ModelReducers<TState = any> = {
@@ -320,6 +321,7 @@ export interface RematchStore<
 	name: string
 	dispatch: RematchDispatch<TModels>
 	addModel: (model: NamedModel<TModels>) => void
+	views: Record< NamedModel<TModels>['name'], Record<string, (args: any)=> any>>
 }
 
 /** ************************** Root State *************************** */

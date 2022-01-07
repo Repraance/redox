@@ -1,7 +1,12 @@
 import { createSelector } from './createSelector';
-import { isComplexObject } from '../utils';
-import { Store } from '../types';
-import { InternalModel } from '../model';
+import { Models, NamedModel, RematchBag, RematchStore } from '../types'
+import validate, { isObject } from '../validate'
+
+const objectToString = Object.prototype.toString;
+
+function isComplexObject(obj: any): boolean {
+	return objectToString.call(obj) === '[object Object]' || Array.isArray(obj);
+}
 
 interface ICompare {
   tree: Map<
@@ -239,59 +244,44 @@ function cacheFactory(
   );
 }
 
-const createViewsManager = (store: Store) => {
-  const viewsModelsMap = new Map<
-    string,
-    Record<string, (...args: any[]) => any>
-  >();
-  const getView = function (name: string) {
-    return viewsModelsMap.get(name);
-  };
-  const addView = function (model: InternalModel<any, any, any, any, any>) {
-    const views = model.views;
-    const name = model.name;
-    const dependencies =
-      (model._rootModels &&
-        Object.values(model._rootModels).map(
-          m => (m as { name: string }).name
-        )) ||
-      [];
-    if (views) {
-      const proxyObj: Record<string, (args: any) => any> = {};
-      Object.keys(views || {}).forEach((selectorName: string) => {
-        const cacheFun = cacheFactory(views[selectorName], proxyObj);
-        proxyObj[selectorName] = function (args: any) {
-          const State = store.getState();
-          const state = State[name];
-          const rootState: Record<string, any> = {};
-          // generate rootState by dependencies
-          dependencies.forEach(function (dep: string) {
-            rootState[dep] = State[dep];
-          });
-          return cacheFun(state, rootState, args);
-        };
-      });
-      viewsModelsMap.set(name, proxyObj);
-    }
-  };
-  return {
-    addView,
-    getView
-  };
-};
+export const createViews = <
+	TModels extends Models<TModels>,
+	TExtraModels extends Models<TModels>,
+	TModel extends NamedModel<TModels>
+	>(
+	rematch: RematchStore<TModels, TExtraModels>,
+	_bag: RematchBag<TModels, TExtraModels>,
+	model: TModel
+): void => {
 
-function getStateOrViews(
-  modelName: string,
-  viewsManager: ReturnType<typeof createViewsManager>,
-  store: Store,
-  selector?: (state: any, views: any) => any
-) {
-  const modelState = store.getState()[modelName];
-  const ModelViews = viewsManager.getView(modelName);
-  if (!selector) {
-    return modelState;
-  }
-  return selector(modelState, ModelViews);
+	const views = model.views;
+	if (views) {
+		validate(() => [
+			[
+				!isObject(views),
+				`model.views should be object, now is ${typeof views}`
+			],
+		])
+		const name = model.name;
+		// @ts-ignore
+		const dependenciesModels = model._rootModels || []
+		const dependencies = Object.values(dependenciesModels).map(
+			m => (m as { name: string }).name
+		);
+		const proxyObj: Record<string, (args: any) => any> = {};
+		Object.keys(views || {}).forEach((selectorName: string) => {
+			const cacheFun = cacheFactory(views[selectorName], proxyObj);
+			proxyObj[selectorName] = function (args: any) {
+				const State = rematch.getState();
+				const state = State[name];
+				const rootState: Record<string, any> = {};
+				// generate rootState by dependencies
+				dependencies.forEach(function (dep: string) {
+					rootState[dep] = State[dep];
+				});
+				return cacheFun(state, rootState, args);
+			};
+		});
+		rematch.views[name] = proxyObj
+	}
 }
-
-export { createViewsManager, getStateOrViews };

@@ -27,3 +27,4 @@ export const createSubscribes = <
 		bag.subscribes[`${model.name}`] = model.subscribe
 	}
 }
+

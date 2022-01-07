@@ -18,7 +18,3 @@ export const shadowEqual = (a: any, b: any) => {
 export function isObject(obj: any): boolean {
   return objectToString.call(obj) === '[object Object]';
 }
-
-export function isComplexObject(obj: any): boolean {
-  return isObject(obj) || Array.isArray(obj);
-}

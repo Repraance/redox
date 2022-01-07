@@ -1,5 +1,4 @@
-import validate from '../validate';
-import { isObject } from '../utils';
+import validate, { isObject } from '../validate';
 
 /** A standard function returning true if two values are considered equal */
 type EqualityFn = (a: any, b: any, i: number) => boolean;
