@@ -27,13 +27,14 @@ export default function createRematchStore<
 	TExtraModels extends Models<TModels>
 >(config: Config<TModels, TExtraModels>): RematchStore<TModels, TExtraModels> {
 	// setup rematch 'bag' for storing useful values and functions
+	let rematchStore: RematchStore<TModels, TExtraModels> = {} as RematchStore<TModels, TExtraModels>
 	const bag = createRematchBag(config)
 
 	// add middleware for handling subscribes
 	bag.reduxConfig.middlewares.push(createSubscribesMiddleware(bag))
 
 	// add middleware for handling effects
-	bag.reduxConfig.middlewares.push(createEffectsMiddleware(bag))
+	bag.reduxConfig.middlewares.push(createEffectsMiddleware(bag, rematchStore))
 
 	// collect middlewares from plugins
 	bag.forEachPlugin('createMiddleware', (createMiddleware) => {
@@ -42,7 +43,7 @@ export default function createRematchStore<
 
 	const reduxStore = createReduxStore(bag)
 
-	let rematchStore = {
+	Object.assign(rematchStore, {
 		...reduxStore,
 		name: config.name,
 		addModel(model: NamedModel<TModels>) {
@@ -54,7 +55,7 @@ export default function createRematchStore<
 			reduxStore.dispatch({ type: '@@redux/REPLACE' })
 		},
 		views: {}
-	} as RematchStore<TModels, TExtraModels>
+	}) as RematchStore<TModels, TExtraModels>
 
 	addExposed(rematchStore, config.plugins)
 
@@ -71,7 +72,8 @@ export default function createRematchStore<
 	bag.forEachPlugin('onStoreCreated', (onStoreCreated) => {
 		rematchStore = onStoreCreated(rematchStore, bag) || rematchStore
 	})
-
+	console.warn('reduxStore', reduxStore.dispatch)
+	console.warn('rematchStore', rematchStore.dispatch)
 	return rematchStore
 }
 
@@ -97,18 +99,21 @@ function createSubscribesMiddleware<
 function createEffectsMiddleware<
 	TModels extends Models<TModels>,
 	TExtraModels extends Models<TModels>
->(bag: RematchBag<TModels, TExtraModels>): Middleware {
+>(bag: RematchBag<TModels, TExtraModels>, rematch: any): Middleware {
 	return (store) =>
 		(next) =>
 		(action: Action): any => {
 			if (action.type in bag.effects) {
 				// first run reducer action if exists
 				next(action)
-
+				const modelName = action.type.split('/')[0]
 				// then run the effect and return its result
 				return (bag.effects as any)[action.type](
 					action.payload,
-					store.getState(),
+					store.getState()[modelName], // selfState
+					rematch.dispatch[modelName],	// selfDispatch
+					store.getState(), // rootState
+					rematch.dispatch, // rootDispatch
 					action.meta
 				)
 			}

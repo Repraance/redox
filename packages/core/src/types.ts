@@ -125,7 +125,10 @@ export type ModelEffectThisTyped = {
 export type ModelEffect<TModels extends Models<TModels>> = (
 	this: ModelEffectThisTyped,
 	payload: Action['payload'],
+	state: any,
+	dispatch: any,
 	rootState: RematchRootState<TModels>,
+	rootDispatch: RematchDispatch<TModels>,
 	meta: Action['meta']
 ) => any
 
@@ -134,7 +137,8 @@ export type ModelSubscribe<TModels extends Models<TModels>> = (
 ) => any
 
 export type ModelEffectsCreator<TModels extends Models<TModels>> = (
-	dispatch: RematchDispatch<TModels>
+	dispatch: any,
+	rootDispatch: RematchDispatch<TModels>
 ) => ModelEffects<TModels>
 
 /** ************************** Plugin *************************** */
@@ -605,7 +609,8 @@ export type ExtractRematchDispatcherFromEffect<
 		: RematchDispatcher<
 				true,
 				ExtractParameterFromEffect<TRest, 'payload'>,
-				ExtractParameterFromEffect<TRest, 'meta'>,
+				// ExtractParameterFromEffect<TRest, 'meta'>,
+				never,
 				TReturn
 		  >
 	: never
