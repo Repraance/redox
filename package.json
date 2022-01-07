@@ -1,10 +1,10 @@
 {
-  "name": "rematch",
+  "name": "redox",
   "private": true,
-  "description": "The root package for rematch",
-  "homepage": "https://rematchjs.org",
+  "description": "The root package for redox",
+  "homepage": "https://shuvijs.github.io/shuvijs.org",
   "bugs": {
-    "url": "https://github.com/rematch/rematch/issues"
+    "url": "https://github.com/shuvijs/redox/issues"
   },
   "keywords": [
     "@rematch",
@@ -15,17 +15,11 @@
     "typescript"
   ],
   "license": "MIT",
-  "authors": [
-    "Blair Bodnar <blairbodnar@gmail.com> (https://github.com/blairbodnar)",
-    "Shawn McKay <shawn.j.mckay@gmail.com> (https://github.com/shmck)"
-  ],
-  "contributors": [
-    "Sergio Moreno <sergiomorenoalbert@gmail.com> (https://github.com/semoal)",
-    "Przemyslaw Jamrozowicz <> (https://github.com/pjamrozowicz)"
-  ],
+  "authors": [],
+  "contributors": [],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rematch/rematch.git"
+    "url": "git+https://github.com/shuvijs/redox.git"
   },
   "scripts": {
     "pre-commit": "lint-staged",

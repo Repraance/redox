@@ -1,8 +1,8 @@
 {
-  "name": "@rematch/core",
-  "version": "2.2.0",
+  "name": "@shuvi/redox-core",
+  "version": "0.0.1-pre.1",
   "description": "A Redux Framework",
-  "homepage": "https://rematchjs.org",
+  "homepage": "https://shuvijs.github.io/shuvijs.org",
   "sideEffects": false,
   "main": "dist/index.js",
   "module": "dist/core.esm.js",
@@ -22,8 +22,7 @@
   },
   "files": [
     "dist",
-    "src",
-    "../../README.md"
+    "src"
   ],
   "engines": {
     "node": ">=10"
@@ -39,12 +38,9 @@
   "peerDependencies": {
     "redux": ">=4"
   },
-  "authors": [
-    "Blair Bodnar <blairbodnar@gmail.com> (https://github.com/blairbodnar)",
-    "Shawn McKay <shawn.j.mckay@gmail.com> (https://github.com/shmck)"
-  ],
+  "authors": [],
   "bugs": {
-    "url": "https://github.com/rematch/rematch/issues"
+    "url": "https://github.com/shuvijs/redox/issues"
   },
   "keywords": [
     "@rematch",
@@ -56,6 +52,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rematch/rematch.git"
+    "url": "git+https://github.com/shuvijs/redox.git"
   }
 }
