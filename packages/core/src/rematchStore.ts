@@ -108,6 +108,14 @@ function createEffectsMiddleware<
 				next(action)
 				const modelName = action.type.split('/')[0]
 				// then run the effect and return its result
+				if (action.isFunctionEffect) {
+					return (bag.effects as any)[action.type](
+						action.payload,
+						store.getState()[modelName], // selfState
+						store.getState(), // rootState
+						action.meta
+					)
+				}
 				return (bag.effects as any)[action.type](
 					action.payload,
 					store.getState()[modelName], // selfState

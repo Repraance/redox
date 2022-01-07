@@ -651,8 +651,8 @@ describe('effects:', () => {
 
 			expect(secondParam).toBe(7)
 		})
-		it('forth param should contain rootState', async () => {
-			let forthParam: any
+		it('third param should contain rootState', async () => {
+			let thirdParam: any
 
 			interface RootModel extends Models<RootModel> {
 				count: typeof count
@@ -664,8 +664,8 @@ describe('effects:', () => {
 					add: (s: number, p: number): number => s + p,
 				},
 				effects: () => ({
-					makeCall(_: void, _state, _dispatch, rootState): void {
-						forthParam = rootState
+					makeCall(_: void, _state, rootState): void {
+						thirdParam = rootState
 					},
 				}),
 			})
@@ -674,7 +674,33 @@ describe('effects:', () => {
 				models: { count } as RootModel,
 			})
 			store.dispatch.count.makeCall()
-			expect(forthParam).toEqual({ count: 7 })
+			expect(thirdParam).toEqual({ count: 7 })
+		})
+
+		it('forth param should contain rootState', async () => {
+			let forthParam: any = {}
+
+			interface RootModel extends Models<RootModel> {
+				count: typeof count
+			}
+			const count = createModel<RootModel>()({
+				name: 'count',
+				state: 7,
+				reducers: {
+					add: (s: number, p: number): number => s + p,
+				},
+				effects: () => ({
+					makeCall(_: void, _state, _rootState, p): void {
+						forthParam = p
+					},
+				}),
+			})
+
+			const store = init({
+				models: { count } as RootModel,
+			})
+			store.dispatch.count.makeCall()
+			expect(forthParam).toBe(undefined)
 		})
 	})
 })

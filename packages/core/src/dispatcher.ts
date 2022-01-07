@@ -23,7 +23,8 @@ const createActionDispatcher = <
 	rematch: RematchStore<TModels, TExtraModels>,
 	modelName: string,
 	actionName: string,
-	isEffect: boolean
+	isEffect: boolean,
+	isFunctionEffect: boolean
 ): RematchDispatcher<boolean> => {
 	return Object.assign(
 		(payload?: any, meta?: any): Action => {
@@ -37,10 +38,15 @@ const createActionDispatcher = <
 				action.meta = meta
 			}
 
+			if (isFunctionEffect) {
+				action.isFunctionEffect = true
+			}
+
 			return rematch.dispatch(action)
 		},
 		{
 			isEffect,
+			isFunctionEffect
 		}
 	)
 }
@@ -68,6 +74,7 @@ export const createReducerDispatcher = <
 			rematch,
 			model.name,
 			reducerName,
+			false,
 			false
 		)
 	})
@@ -88,13 +95,15 @@ export const createEffectDispatcher = <
 ): void => {
 	const modelDispatcher = rematch.dispatch[model.name]
 	let effects: ModelEffects<TModels> = {}
-
+	let isFunctionEffect = false
 	// 'effects' might be actually a function creating effects
 	if (model.effects) {
-		effects =
-			typeof model.effects === 'function'
-				? (model.effects as ModelEffectsCreator<TModels>)(modelDispatcher, rematch.dispatch)
-				: model.effects
+		if (typeof model.effects === 'function') {
+			effects = (model.effects as ModelEffectsCreator<TModels>)(modelDispatcher, rematch.dispatch)
+			isFunctionEffect = true
+		} else {
+			effects = model.effects
+		}
 	}
 
 	// map effects names to dispatch actions
@@ -109,7 +118,8 @@ export const createEffectDispatcher = <
 			rematch,
 			model.name,
 			effectName,
-			true
+			true,
+			isFunctionEffect
 		)
 	})
 }

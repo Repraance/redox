@@ -58,6 +58,7 @@ export interface Action<TPayload = any, TMeta = any>
 	extends ReduxAction<string> {
 	payload?: TPayload
 	meta?: TMeta
+	isFunctionEffect?: boolean
 }
 
 /**
@@ -114,6 +115,10 @@ export interface ModelEffects<TModels extends Models<TModels>> {
 	[key: string]: ModelEffect<TModels>
 }
 
+export interface ModelEffectsFunction<TModels extends Models<TModels>> {
+	[key: string]: ModelEffectFuntion<TModels>
+}
+
 export interface ModelSubscribes<TModels extends Models<TModels>> {
 	[key: string]: ModelSubscribe<TModels>
 }
@@ -132,6 +137,14 @@ export type ModelEffect<TModels extends Models<TModels>> = (
 	meta: Action['meta']
 ) => any
 
+export type ModelEffectFuntion<TModels extends Models<TModels>> = (
+	this: ModelEffectThisTyped,
+	payload: Action['payload'],
+	state: any,
+	rootState: RematchRootState<TModels>,
+	meta: Action['meta']
+) => any
+
 export type ModelSubscribe<TModels extends Models<TModels>> = (
 	payload: Action,
 ) => any
@@ -139,7 +152,7 @@ export type ModelSubscribe<TModels extends Models<TModels>> = (
 export type ModelEffectsCreator<TModels extends Models<TModels>> = (
 	dispatch: any,
 	rootDispatch: RematchDispatch<TModels>
-) => ModelEffects<TModels>
+) => ModelEffectsFunction<TModels>
 
 /** ************************** Plugin *************************** */
 
