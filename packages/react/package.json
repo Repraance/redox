@@ -1,6 +1,6 @@
 {
-  "name": "@rematch/react",
-  "version": "0.0.1",
+  "name": "@shuvi/redox-react",
+  "version": "0.0.1-pre.1",
   "sideEffects": false,
   "description": "Rematch core with react hooks",
   "homepage": "https://rematchjs.org",
@@ -48,6 +48,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rematch/rematch.git"
+    "url": "git+https://github.com/shuvijs/redox.git"
   }
 }
