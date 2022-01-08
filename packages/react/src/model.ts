@@ -1,5 +1,5 @@
 import validate from './validate';
-import { ExtractRematchDispatcherFromReducer } from '@rematch/core';
+import { ExtractRematchDispatcherFromReducer } from '@shuvi/redox-core';
 import { isObject } from './utils';
 export type State = any;
 

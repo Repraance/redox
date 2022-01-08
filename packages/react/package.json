@@ -27,13 +27,13 @@
   "dependencies": {
 	},
 	"devDependencies": {
-		"@rematch/core": ">=2",
+		"@shuvi/redox-core": "0.0.1-pre.1",
 		"react": ">=16.8",
 		"react-dom": ">=16.8",
 		"@types/react": "^16.9.43"
 	},
 	"peerDependencies": {
-		"@rematch/core": ">=2",
+		"@shuvi/redox-core": "0.0.1-pre.1",
 		"react": ">=16.8",
 		"react-dom": ">=16.8"
 	},
