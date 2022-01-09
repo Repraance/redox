@@ -44,6 +44,24 @@ const getProxyHandler = () => {
   };
   return handler;
 };
+function createProxyObjFactory(){
+	const proxyObjMap = new WeakMap<Record<string, any>, typeof Proxy>();
+	return function createProxyObj(
+		target: Record<string, any>,
+		collection: typeof getStateCollection
+	) {
+		if (proxyObjMap.has(target)) {
+			return proxyObjMap.get(target);
+		}
+		const proxy = new Proxy(target, collection());
+		proxyObjMap.set(target, proxy);
+		return proxy;
+	}
+}
+
+const stateCreateProxyObj = createProxyObjFactory()
+const rootStateCreateProxyObj = createProxyObjFactory()
+
 let compareStatePos: ICompare;
 const getStateCollection = () => {
   return {
@@ -63,7 +81,7 @@ const getStateCollection = () => {
         }
       }
       if (isComplexObject(result)) {
-        result = createProxyObj(result, getStateCollection);
+        result = stateCreateProxyObj(result, getStateCollection);
       }
       return result;
     }
@@ -89,25 +107,12 @@ const getRootStateCollection = () => {
         }
       }
       if (isComplexObject(result)) {
-        result = createProxyObj(result, getRootStateCollection);
+        result = rootStateCreateProxyObj(result, getRootStateCollection);
       }
       return result;
     }
   };
 };
-
-const proxyObjMap = new WeakMap<Record<string, any>, typeof Proxy>();
-function createProxyObj(
-  target: Record<string, any>,
-  collection: typeof getStateCollection
-) {
-  if (proxyObjMap.has(target)) {
-    return proxyObjMap.get(target);
-  }
-  const proxy = new Proxy(target, collection());
-  proxyObjMap.set(target, proxy);
-  return proxy;
-}
 
 const proxyViewsMap = new Map<
   Record<string, (args: any) => any>,
@@ -181,10 +186,10 @@ function cacheFactory(
       viewsCompare.new.clear();
 
       compareStatePos = stateCompare;
-      const tempState = createProxyObj(state, getStateCollection);
+      const tempState = stateCreateProxyObj(state, getStateCollection);
 
       compareRootStatePos = rootStateCompare;
-      const tempRootStateProxy = createProxyObj(
+      const tempRootStateProxy = rootStateCreateProxyObj(
         rootState,
         getRootStateCollection
       );
