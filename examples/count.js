@@ -1,4 +1,4 @@
-import { init } from '@rematch/core'
+import { init } from '@shuvi/redox-core'
 
 const count = {
 	state: 0,

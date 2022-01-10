@@ -341,12 +341,12 @@ describe('Dispatcher typings', () => {
 			dispatch.count.incrementEffect('test', { prueba: 'hola ' })
 		})
 
-		it('optional payload and accessing rootState', () => {
+		it('optional payload and accessing store', () => {
 			const count = createModel<RootModel>()({
 				state: 0, // initial state
 				effects: () => ({
-					incrementEffect(payload?: number, _state?, rootState?): number | undefined {
-						if (rootState.count) {
+					incrementEffect(payload?: number, _state?, store?): number | undefined {
+						if (store.getState()) {
 							// do nothing
 						}
 						return payload
@@ -394,7 +394,7 @@ describe('Dispatcher typings', () => {
 				myModel: typeof model
 			}
 
-			const store = init({ models: { myModel: model } })
+			const store = init({ models: { myModel: model } as RootModel })
 			const { dispatch } = store
 
 			dispatch.myModel.incWithRequiredMeta(4, '4')

@@ -1,4 +1,4 @@
-import { Models } from '@rematch/core'
+import { Models } from '@shuvi/redox-core'
 import { dolphins } from './dolphins'
 import { sharks } from './sharks'
 
