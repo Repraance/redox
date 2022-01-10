@@ -1,4 +1,4 @@
-import { init, RematchDispatch, RematchRootState } from '@rematch/core'
+import { init, RematchDispatch, RematchRootState } from '@shuvi/redox-core'
 import { models, RootModel } from './models'
 
 export const store = init({
