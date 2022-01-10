@@ -1,4 +1,3 @@
-/* tslint:disable */
 // import { init } from '../src'
 import { init } from '@shuvi/redox';
 import { defineModel } from '../src'
@@ -31,8 +30,7 @@ describe('views:', () => {
 				},
 			},
 			views:{
-				//@ts-ignore
-				first_view: (state, dependsState, views, args)=>{
+				first_view: (state)=>{
 					firstComputeTimes++;
 					return state.first_Object.first_a.arr[0];
 				}
@@ -64,14 +62,12 @@ describe('views:', () => {
 				},
 			},
 			views:{
-				//@ts-ignore
-				second_view: (state, dependsState, views, args)=>{
+				second_view: (state, dependsState)=>{
 					secondComputeTimes++;
 					return dependsState.first.first_Object.first_a.arr[0] + state.second_Object.second_b.number;
 				},
-				//@ts-ignore
-				other: (state, dependsState, views, args)=>{
-				}
+				// other: (state, dependsState)=>{
+				// }
 			}
 		}, {first});
 		const store = init();
@@ -139,8 +135,7 @@ describe('views:', () => {
 				}
 			},
 			views:{
-				//@ts-ignore
-				first_c_view: (state, dependsState, views, args)=>{
+				first_c_view: (state, _dependsState, _views, args)=>{
 					firstComputeTimes++;
 					return state.first_Object.a.b.c + args
 				}
@@ -178,7 +173,6 @@ describe('views:', () => {
 				}
 			},
 			reducers: {
-				//@ts-ignore
 				changedNumber: (state) => {
 					return {
 						...state,
@@ -189,11 +183,9 @@ describe('views:', () => {
 				}
 			},
 			views:{
-				//@ts-ignore
 				first_a_view (state){
 					return state.first_a.arr[0]
 				},
-				//@ts-ignore
 				first_b_view (state){
 					return state.first_b.number
 				},
@@ -232,58 +224,56 @@ describe('views:', () => {
 		expect(firstComputeTimes).toBe(2);
 
 	})
-	// test('works with immer', () => {
-	// 	let firstComputeTimes = 0;
-	// 	const first = defineModel({
-	// 		name: 'first',
-	// 		state: {
-	// 			first_Object: {
-	// 				a:{
-	// 					b:{
-	// 						c:'c'
-	// 					}
-	// 				}
-	// 			},
-	// 		},
-	// 		reducers: {
-	// 			changedB: (state) => {
-	// 				state.first_Object.a.b = {
-	// 					c:'c'
-	// 				}
-	// 				return state;
-	// 			},
-	// 			changedC: (state) => {
-	// 				state.first_Object.a.b.c = 'd'
-	// 				return state;
-	// 			}
-	// 		},
-	// 		views:{
-	// 			//@ts-ignore
-	// 			first_c_view: (state, dependsState, views, args)=>{
-	// 				firstComputeTimes++;
-	// 				return state.first_Object.a.b.c
-	// 			}
-	// 		}
-	// 	});
-	// 	const store = init();
-	// 	let viewsValue;
-	// 	//@ts-ignore
-	// 	store.addModel(first);
-	//
-	// 	expect(firstComputeTimes).toBe(0);
-	// 	viewsValue = store.views.first.first_c_view();
-	// 	expect(firstComputeTimes).toBe(1);
-	// 	expect(viewsValue).toBe('c');
-	//
-	// 	store.dispatch.first.changedB();
-	// 	viewsValue = store.views.first.first_c_view();
-	// 	expect(firstComputeTimes).toBe(1);
-	// 	expect(viewsValue).toBe('c');
-	//
-	// 	store.dispatch.first.changedC();
-	// 	viewsValue = store.views.first.first_c_view();
-	// 	expect(firstComputeTimes).toBe(2);
-	// 	expect(viewsValue).toBe('d');
-	//
-	// })
+	test('works with immer', () => {
+		let firstComputeTimes = 0;
+		const first = defineModel({
+			name: 'first',
+			state: {
+				first_Object: {
+					a:{
+						b:{
+							c:'c'
+						}
+					}
+				},
+			},
+			reducers: {
+				changedB: (state) => {
+					state.first_Object.a.b = {
+						c:'c'
+					}
+					return state;
+				},
+				changedC: (state) => {
+					state.first_Object.a.b.c = 'd'
+					return state;
+				}
+			},
+			views:{
+				first_c_view: (state)=>{
+					firstComputeTimes++;
+					return state.first_Object.a.b.c
+				}
+			}
+		});
+		const store = init();
+		let viewsValue;
+		//@ts-ignore
+		store.addModel(first);
+
+		expect(firstComputeTimes).toBe(0);
+		viewsValue = store.views.first.first_c_view();
+		expect(firstComputeTimes).toBe(1);
+		expect(viewsValue).toBe('c');
+
+		store.dispatch.first.changedB();
+		viewsValue = store.views.first.first_c_view();
+		expect(firstComputeTimes).toBe(1);
+		expect(viewsValue).toBe('c');
+
+		store.dispatch.first.changedC();
+		viewsValue = store.views.first.first_c_view();
+		expect(firstComputeTimes).toBe(2);
+		expect(viewsValue).toBe('d');
+	})
 })

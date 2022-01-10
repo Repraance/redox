@@ -30,7 +30,6 @@ const countModel = defineModel({
 });
 
 const App = () => {
-	// @ts-ignore
   const [state, dispatch] = useModel(countModel);
 
   return (
@@ -124,7 +123,6 @@ describe('test createGlobalStore', () => {
     const StaticApp = () => {
       renderTime += 1;
 
-      // @ts-ignore
       const [state, dispatch] = useStaticModel(countModel);
 
       currentCount = state.value;
@@ -179,9 +177,7 @@ describe('test createGlobalStore', () => {
 
   it('useLocalModel should work', () => {
     function Container() {
-			// @ts-ignore
 			const [state, dispatch] = useLocalModel(countModel);
-			// @ts-ignore
 			const [state1, dispatch1] = useLocalModel(countModel);
 
       return (
