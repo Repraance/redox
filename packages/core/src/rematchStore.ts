@@ -26,6 +26,7 @@ export default function createRematchStore<
 	TModels extends Models<TModels>,
 	TExtraModels extends Models<TModels>
 >(config: Config<TModels, TExtraModels>): RematchStore<TModels, TExtraModels> {
+	let rematchStore: RematchStore<TModels, TExtraModels> = {} as RematchStore<TModels, TExtraModels>
 	// setup rematch 'bag' for storing useful values and functions
 	const bag = createRematchBag(config)
 
@@ -33,7 +34,7 @@ export default function createRematchStore<
 	bag.reduxConfig.middlewares.push(createSubscribesMiddleware(bag))
 
 	// add middleware for handling effects
-	bag.reduxConfig.middlewares.push(createEffectsMiddleware(bag))
+	bag.reduxConfig.middlewares.push(createEffectsMiddleware(bag, rematchStore))
 
 	// collect middlewares from plugins
 	bag.forEachPlugin('createMiddleware', (createMiddleware) => {
@@ -42,7 +43,7 @@ export default function createRematchStore<
 
 	const reduxStore = createReduxStore(bag)
 
-	let rematchStore = {
+	Object.assign(rematchStore, {
 		...reduxStore,
 		name: config.name,
 		addModel(model: NamedModel<TModels>) {
@@ -54,7 +55,7 @@ export default function createRematchStore<
 			reduxStore.dispatch({ type: '@@redux/REPLACE' })
 		},
 		views: {}
-	} as RematchStore<TModels, TExtraModels>
+	}) as RematchStore<TModels, TExtraModels>
 
 	addExposed(rematchStore, config.plugins)
 
@@ -97,7 +98,7 @@ function createSubscribesMiddleware<
 function createEffectsMiddleware<
 	TModels extends Models<TModels>,
 	TExtraModels extends Models<TModels>
->(bag: RematchBag<TModels, TExtraModels>): Middleware {
+>(bag: RematchBag<TModels, TExtraModels>, rematch: RematchStore<TModels, TExtraModels>): Middleware {
 	return (store) =>
 		(next) =>
 		(action: Action): any => {
@@ -109,7 +110,7 @@ function createEffectsMiddleware<
 				return (bag.effects as any)[action.type](
 					action.payload,
 					store.getState()[modelName], 	// selfState
-					store.getState(), 						// rootState
+					rematch,											// rootStore
 					action.meta
 				)
 			}

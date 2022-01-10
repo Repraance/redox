@@ -68,7 +68,7 @@ describe('effects:', () => {
 		expect(secondParam).toBe(7)
 	})
 
-	test('third param should contain rootState', async () => {
+	test('third param should contain rootStore', async () => {
 		let thirdParam: any
 
 		interface RootModel extends Models<RootModel> {
@@ -81,8 +81,8 @@ describe('effects:', () => {
 				add: (s: number, p: number): number => s + p,
 			},
 			effects: {
-				makeCall(_: void, _state, rootState): void {
-					thirdParam = rootState
+				makeCall(_: void, _state, store): void {
+					thirdParam = store
 				},
 			},
 		})
@@ -91,7 +91,7 @@ describe('effects:', () => {
 			models: { count } as RootModel,
 		})
 		store.dispatch.count.makeCall()
-		expect(thirdParam).toEqual({ count: 7 })
+		expect(thirdParam.getState()).toEqual({ count: 7 })
 	})
 
 	test('should create an effect dynamically', () => {

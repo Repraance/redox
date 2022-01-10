@@ -130,7 +130,10 @@ export type ModelEffect<TModels extends Models<TModels>> = (
 	// this: ModelEffectThisTyped,
 	payload: Action['payload'],
 	state: any,
-	rootState: RematchRootState<TModels>,
+	rootState: {
+		getState: () => RematchRootState<TModels>
+		dispatch: RematchDispatch<TModels>
+	},
 	meta: Action['meta']
 ) => any
 

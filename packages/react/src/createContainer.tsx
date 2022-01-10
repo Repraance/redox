@@ -7,11 +7,11 @@ import React, {
   useMemo,
   useRef
 } from 'react';
-import { init, Models, Plugin, NamedModel } from '@shuvi/redox-core';
+import { init, Plugin } from '@shuvi/redox-core';
 import validate from './validate';
 import { createBatchManager } from './batchManager';
 import { shadowEqual } from './utils';
-import { Store } from './types';
+import { InternalModel, IUseModel, Store } from './types';
 
 type initConfig = Parameters<typeof init>[0];
 
@@ -19,30 +19,10 @@ type Config = initConfig & {
   plugins?: ((...args: any[]) => Plugin<any, any>) | Plugin<any, any>;
 };
 
-interface INamedModel<
-  TModels extends Models<TModels>,
-  TState = any,
-  TBaseState = TState
-> extends NamedModel<TModels, TState, TBaseState> {
-	name: string,
-  _beDepends: Set<string>;
-  views?: Record<
-    string,
-    (state: TState, RootState: any, views: any, args: any) => any
-  >;
-}
-
 type selector<TState = any> = (state: TState, views: any) => any;
 
-export interface IUseModel {
-  <TModels extends Models<TModels>, TState = any, TBaseState = TState>(
-    model: INamedModel<TModels, TState, TBaseState>,
-    selector?: selector<TState>
-  ): [any, any];
-}
-
 function initModel(
-  model: INamedModel<any>,
+  model: InternalModel<any, any, any, any, any>,
   store: Store,
   batchManager: ReturnType<typeof createBatchManager>,
 ) {
@@ -56,15 +36,14 @@ function initModel(
         initModel(model, store, batchManager);
       });
     }
-    (
-      model as INamedModel<any>
-    ).subscribe = function(){
+    model.subscribe = function(){
 			batchManager.triggerSubsribe(name); // render self;
 			const _beDepends = [...(model._beDepends || [])];
 			_beDepends.forEach(beDepend => {
 				batchManager.triggerSubsribe(beDepend); // render deDepend;
 			});
 		};
+		// @ts-ignore
     store.addModel(model);
     batchManager.addSubsribe(name);
   }
@@ -185,7 +164,7 @@ const createContainer = (config: Config) => {
       return modelValue;
     };
 
-  const useModel: IUseModel = (model, selector) => {
+  const useModel: IUseModel = (model, selector?) => {
 
     const context = useContext(Context);
 
@@ -207,7 +186,7 @@ const createContainer = (config: Config) => {
     )(model, selector);
   };
 
-  const useStaticModel: IUseModel = (model, selector) => {
+  const useStaticModel: IUseModel = (model, selector?) => {
     const context = useContext(Context);
 
 		validate(() => [
@@ -255,7 +234,7 @@ const createContainer = (config: Config) => {
     return value.current;
   };
 
-  const useLocalModel: IUseModel = (model, selector) => {
+  const useLocalModel: IUseModel = (model, selector?) => {
     const [store, batchManager] = useMemo(() => {
       const newStore = init(getFinalConfig());
       return [newStore, createBatchManager()];
