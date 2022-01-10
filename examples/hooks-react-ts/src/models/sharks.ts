@@ -1,4 +1,4 @@
-import { createModel } from '@shuvi/redox-core'
+import { createModel } from '@shuvi/redox'
 import { delay } from './utils'
 import type { RootModel } from '.'
 

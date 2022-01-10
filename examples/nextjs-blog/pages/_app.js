@@ -1,6 +1,6 @@
 import App from 'next/app'
 import { Provider } from 'react-redux'
-import { init } from '@shuvi/redox-core'
+import { init } from '@shuvi/redox'
 import * as models from '../models'
 
 const store = init({

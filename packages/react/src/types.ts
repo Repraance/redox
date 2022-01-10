@@ -1,4 +1,4 @@
-import { init, Action, ExtractRematchDispatcherFromReducer, RematchDispatcher } from '@shuvi/redox-core';
+import { init, Action, ExtractRematchDispatcherFromReducer, RematchDispatcher } from '@shuvi/redox';
 
 export type Store = ReturnType<typeof init>;
 

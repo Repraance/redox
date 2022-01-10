@@ -1,4 +1,4 @@
-import { Models } from '@shuvi/redox-core'
+import { Models } from '@shuvi/redox'
 import { dolphins } from './dolphins'
 import { sharks } from './sharks'
 

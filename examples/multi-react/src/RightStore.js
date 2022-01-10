@@ -1,5 +1,5 @@
 import React from 'react'
-import { init } from '@shuvi/redox-core'
+import { init } from '@shuvi/redox'
 import Counter from './Counter'
 
 const count = {

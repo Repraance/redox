@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { init } from '@shuvi/redox-core'
+import { init } from '@shuvi/redox'
 import Spinner from 'react-spinkit'
 import createPersistPlugin, { getPersistor } from '@rematch/persist'
 import { PersistGate } from 'redux-persist/es/integration/react'

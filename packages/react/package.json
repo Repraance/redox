@@ -33,7 +33,7 @@
 		"@types/react": "^16.9.43"
 	},
 	"peerDependencies": {
-		"@shuvi/redox-core": "0.0.1-pre.1",
+		"@shuvi/redox": "0.0.1-pre.1",
 		"react": ">=16.8",
 		"react-dom": ">=16.8"
 	},

@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { init } from '@shuvi/redox-core'
+import { init } from '@shuvi/redox'
 import * as models from './models'
 import App from './App'
 

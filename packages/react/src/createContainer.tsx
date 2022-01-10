@@ -7,7 +7,7 @@ import React, {
   useMemo,
   useRef
 } from 'react';
-import { init, Plugin } from '@shuvi/redox-core';
+import { init, Plugin } from '@shuvi/redox';
 import validate from './validate';
 import { createBatchManager } from './batchManager';
 import { shadowEqual } from './utils';
