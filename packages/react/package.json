@@ -16,7 +16,7 @@
   "scripts": {
     "start": "dts watch",
     "build": "dts build --format cjs,esm,umd --tsconfig ./tsconfig.build.json",
-    "test": "dts test",
+    "test": "dts test test/views.test",
     "lint": "dts lint",
     "clean": "rimraf dist"
   },
@@ -27,7 +27,7 @@
   "dependencies": {
 	},
 	"devDependencies": {
-		"@shuvi/redox-core": "0.0.1-pre.1",
+		"@shuvi/redox": "0.0.1-pre.1",
 		"react": ">=16.8",
 		"react-dom": ">=16.8",
 		"@types/react": "^16.9.43"
