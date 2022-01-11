@@ -15,9 +15,8 @@
     },
     "publish": {
       "allowBranch": [
-        "main",
-        "master",
-        "next"
+        "dev",
+        "master"
       ],
       "registry": "https://registry.npmjs.org/",
       "ignoreChanges": [
