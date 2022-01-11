@@ -28,7 +28,7 @@ const countModel = defineModel({
     }
   },
 	views:{
-		test:(state, _dependsState, _views, args)=>{
+		test:(state, _dependsState, args)=>{
 			return state.value + args
 		}
 	}
