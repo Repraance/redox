@@ -203,7 +203,6 @@ function cacheFactory(
         tempViewsProxy,
         tempState,
         tempRootStateProxy,
-        tempViewsProxy,
         tempOtherArgs
       );
       isCollectionKeys = false;

@@ -30,7 +30,7 @@ describe('views:', () => {
 				},
 			},
 			views:{
-				first_view: (state)=>{
+				first_view(state){
 					firstComputeTimes++;
 					return state.first_Object.first_a.arr[0];
 				}
@@ -62,14 +62,14 @@ describe('views:', () => {
 				},
 			},
 			views:{
-				second_view: (state, dependsState)=>{
+				second_view(state, dependsState){
 					secondComputeTimes++;
 					return dependsState.first.first_Object.first_a.arr[0] + state.second_Object.second_b.number;
 				},
 				// other: (state, dependsState)=>{
 				// }
 			}
-		}, {first});
+		}, { first });
 		const store = init();
 		//@ts-ignore
 		store.addModel(first);
@@ -135,7 +135,7 @@ describe('views:', () => {
 				}
 			},
 			views:{
-				first_c_view: (state, _dependsState, _views, args)=>{
+				first_c_view: (state, _dependsState, args)=>{
 					firstComputeTimes++;
 					return state.first_Object.a.b.c + args
 				}
@@ -190,8 +190,7 @@ describe('views:', () => {
 					return state.first_b.number
 				},
 				first_c_view (){
-					//@ts-ignore
-					return this.first_b_view*2
+					return this.first_b_view * 2
 				},
 				//@ts-ignore
 				first_view (){
@@ -250,7 +249,7 @@ describe('views:', () => {
 				}
 			},
 			views:{
-				first_c_view: (state)=>{
+				first_c_view(state){
 					firstComputeTimes++;
 					return state.first_Object.a.b.c
 				}
