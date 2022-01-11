@@ -1,5 +1,5 @@
 import * as Redux from 'redux'
-import produce from 'immer'
+import produce, {setAutoFreeze} from 'immer'
 import {
 	Action,
 	ConfigRedux,
@@ -44,6 +44,7 @@ export default function createReduxStore<
 	)
 }
 
+setAutoFreeze(false);
 function wrapReducerWithImmer(reducer: Redux.Reducer) {
 	return (state: any, payload: any): any => {
 		if (state === undefined) return reducer(state, payload)

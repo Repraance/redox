@@ -1,4 +1,4 @@
-import { createModel } from '@shuvi/redox-core'
+import { createModel } from '@shuvi/redox'
 import type { RootModel } from '.'
 
 type QuestionType = 'boolean' | 'multiple' | 'mixed'

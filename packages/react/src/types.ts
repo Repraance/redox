@@ -1,4 +1,4 @@
-import { init, Action, ExtractRematchDispatcherFromReducer, RematchDispatcher } from '@shuvi/redox-core';
+import { init, Action, ExtractRematchDispatcherFromReducer, RematchDispatcher } from '@shuvi/redox';
 
 export type Store = ReturnType<typeof init>;
 
@@ -32,9 +32,8 @@ export type Reducers<S> = {
 export type View<S extends State, RM extends ModelCollection> = (
 	state: S,
 	rootState: StateOfModelCollection<RM>,
-	views: any,
 	args: any
-) => unknown;
+) => any;
 
 export type Views<S extends State, RM extends ModelCollection> = {
 	[key: string]: View<S, RM>;
@@ -55,7 +54,7 @@ export type Model<
 		state: S;
 		reducers?: R;
 		effects?: E & ThisType<DispatchOfModelByProps<S, R, E>>
-		views?: V;
+		views?: V & ThisType<ViewsKey<V>>;
 		subscribe?: (payload: Action) => any
 	};
 
@@ -99,6 +98,8 @@ export type DispatchOfModel<M extends InternalModel<any, any, any, any, any>> = 
 
 
 export type DispatchOfModelByProps<S, R, E> = DispatcherOfReducers<S, R> & DispatcherOfEffects<E>
+
+type ViewsKey<V> = V extends {[X: string]: (...args: any[])=> any} ? {[K in keyof V]: ReturnType<V[K]>} : {}
 
 /**
 * Matches an effect to different forms and based on the form, selects an

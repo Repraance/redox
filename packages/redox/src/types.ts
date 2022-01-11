@@ -330,7 +330,7 @@ export interface RematchStore<
 	name: string
 	dispatch: RematchDispatch<TModels>
 	addModel: (model: NamedModel<TModels>) => void
-	views: Record< NamedModel<TModels>['name'], Record<string, (args: any)=> any>>
+	views: Record< NamedModel<TModels>['name'], Record<string, (args?: any)=> any>>
 }
 
 /** ************************** Root State *************************** */

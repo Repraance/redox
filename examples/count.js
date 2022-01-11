@@ -1,4 +1,4 @@
-import { init } from '@shuvi/redox-core'
+import { init } from '@shuvi/redox'
 
 const count = {
 	state: 0,
