@@ -7,8 +7,8 @@
     "url": "https://github.com/shuvijs/redox/issues"
   },
   "keywords": [
-    "@rematch",
-    "rematch",
+    "@shuvi",
+    "redox",
     "redux",
     "state management",
     "javascript",
@@ -81,10 +81,7 @@
     ]
   },
   "workspaces": [
-    "packages/*",
-    "examples/all-plugins-react-ts",
-    "examples/hooks-react-ts",
-    "examples/count-react-ts"
+    "packages/*"
   ],
   "size-limit": [
     {
