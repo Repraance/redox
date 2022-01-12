@@ -27,14 +27,14 @@
   "engines": {
     "node": ">=10"
   },
-	"dependencies": {
-		"immer": "^8.0.1",
-		"tiny-invariant": "^1.2.0"
-	},
-	"devDependencies": {
-		"redux": "^4.0.5",
-		"typings-tester": "^0.3.2"
-	},
+  "dependencies": {
+    "immer": "^8.0.1",
+    "tiny-invariant": "^1.2.0"
+  },
+  "devDependencies": {
+    "redux": "^4.0.5",
+    "typings-tester": "^0.3.2"
+  },
   "peerDependencies": {
     "redux": ">=4"
   },
