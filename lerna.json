@@ -1,31 +1,5 @@
 {
-  "version": "independent",
-  "useWorkspaces": true,
   "npmClient": "yarn",
-  "command": {
-    "version": {
-      "message": "chore(release): released new version [skip ci]",
-      "ignoreChanges": [
-        "**/CHANGELOG.md",
-        "**/examples/*",
-        "**/node_modules/**",
-        "**/package.json",
-        "**/*.md"
-      ]
-    },
-    "publish": {
-      "allowBranch": [
-        "dev",
-        "master"
-      ],
-      "registry": "https://registry.npmjs.org/",
-      "ignoreChanges": [
-        "**/CHANGELOG.md",
-        "**/examples/*",
-        "**/node_modules/**",
-        "**/package.json",
-        "**/*.md"
-      ]
-    }
-  }
+  "useWorkspaces": true,
+  "version": "independent"
 }
