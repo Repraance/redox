@@ -1,6 +1,6 @@
 {
   "name": "@shuvi/redox",
-  "version": "0.0.1-pre.3",
+  "version": "0.0.1-pre.4",
   "description": "A Redux Framework",
   "homepage": "https://shuvijs.github.io/shuvijs.org",
   "sideEffects": false,
@@ -28,6 +28,7 @@
     "node": ">=10"
   },
   "dependencies": {
+    "@types/react-redux": "^7.1.9",
     "immer": "^8.0.1",
     "tiny-invariant": "^1.2.0"
   },
