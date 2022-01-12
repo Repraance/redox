@@ -28,7 +28,7 @@ const countModel = defineModel({
     }
   },
 	views:{
-		test:(state, _dependsState, args)=>{
+		test(state, _dependsState, args): number{
 			return state.value + args
 		}
 	}
@@ -113,8 +113,10 @@ describe('test batch', () => {
     let renderCount = 0;
     let computed = 0;
 
-		//@ts-ignore
-		const selector = function(state, views){
+		const selector = function<S extends {value: number}, V extends {test: (args:number)=>number}>(state: S, views:V):{
+      test: number,
+      value: number
+    }{
 			computed+=1;
     	return {
 				test: views.test(3),
@@ -216,18 +218,11 @@ describe('test batch', () => {
 				},
 			},
 			views:{
-				test:(state, dependsState)=>{
+				test(state, dependsState): number{
 					return state.value + dependsState.countModel.value
 				}
 			}
 		}, { countModel });
-
-		//@ts-ignore
-		const selector = function(state, views){
-			return {
-				test: views.test()
-			}
-		}
 
     function SubApp() {
       childRenderCount += 1;
@@ -251,10 +246,15 @@ describe('test batch', () => {
       );
     }
 
+    const selector = function(_state: any, views: {test:()=>number}){
+			return {
+				test: views.test()
+			}
+		}
+
     function App() {
       parentRenderCount += 1;
       const [{ test }, { addValue }] = useModel(
-				//@ts-ignore
 				appModel,
         selector
       );

@@ -54,7 +54,7 @@ export type Model<
 		state: S;
 		reducers?: R;
 		effects?: E & ThisType<DispatchOfModelByProps<S, R, E>>
-		views?: V & ThisType<ViewsKey<V>>;
+		views?: V & ThisType<ViewsObj<V>>;
 		subscribe?: (payload: Action) => any
 	};
 
@@ -99,7 +99,7 @@ export type DispatchOfModel<M extends InternalModel<any, any, any, any, any>> = 
 
 export type DispatchOfModelByProps<S, R, E> = DispatcherOfReducers<S, R> & DispatcherOfEffects<E>
 
-type ViewsKey<V> = V extends {[X: string]: (...args: any[])=> any} ? {[K in keyof V]: ReturnType<V[K]>} : {}
+type ViewsObj<V> = V extends {[X: string]: (...args: any[])=> any} ? {[K in keyof V]: ReturnType<V[K]>} : {}
 
 /**
 * Matches an effect to different forms and based on the form, selects an
@@ -187,14 +187,14 @@ export type DispatcherOfReducers<S, R> = R extends undefined ?
 	}
 	: {});
 
-
+export type selectorFn<S, RM extends ModelCollection, V extends Views<S, RM>> = (state: S, views: {[K in keyof V]: (args?: any)=>ReturnType<V[K]>})=>any;
 export interface IUseModel {
 	<S, RM extends ModelCollection, R extends Reducers<S>, E extends Effects<S, R, RM>, V extends Views<S, RM>>(
 		model: InternalModel<S, RM, R, E, V>
 	): [S, DispatchOfModelByProps<S, R, E>];
 
-	<S, RM extends ModelCollection, R extends Reducers<S>, E extends Effects<S, R, RM>, V extends Views<S, RM>>(
+	<S, RM extends ModelCollection, R extends Reducers<S>, E extends Effects<S, R, RM>, V extends Views<S, RM>, Selector extends selectorFn<S, RM, V>>(
 		model: InternalModel<S, RM, R, E, V>,
-		selectors: any
-	): [any, DispatchOfModelByProps<S, R, E>];
+		selectors: Selector
+	): [ReturnType<Selector>, DispatchOfModelByProps<S, R, E>];
 }

@@ -7,11 +7,11 @@ import React, {
   useMemo,
   useRef
 } from 'react';
-import { init, Plugin } from '@shuvi/redox';
+import { init, Plugin, NamedModel } from '@shuvi/redox';
 import validate from './validate';
 import { createBatchManager } from './batchManager';
 import { shadowEqual } from './utils';
-import { InternalModel, IUseModel, Store } from './types';
+import { InternalModel, IUseModel, Store, selectorFn, ModelCollection, Reducers, Effects, Views, DispatchOfModelByProps } from './types';
 
 type initConfig = Parameters<typeof init>[0];
 
@@ -19,20 +19,16 @@ type Config = initConfig & {
   plugins?: ((...args: any[]) => Plugin<any, any>) | Plugin<any, any>;
 };
 
-type selector<TState = any> = (state: TState, views: any) => any;
-
-function initModel(
-  model: InternalModel<any, any, any, any, any>,
+function initModel<S, RM extends ModelCollection, R extends Reducers<S>, E extends Effects<S, R, RM>, V extends Views<S, RM>>(
+  model: InternalModel<S, RM, R, E, V>,
   store: Store,
   batchManager: ReturnType<typeof createBatchManager>,
 ) {
   const name = model.name || '';
   if (!batchManager.hasInitModel(name)) {
-    //@ts-ignore
     const rootModels = model._rootModels;
     if (rootModels) {
       Object.values(rootModels).forEach(model => {
-        //@ts-ignore
         initModel(model, store, batchManager);
       });
     }
@@ -43,35 +39,40 @@ function initModel(
 				batchManager.triggerSubsribe(beDepend); // render deDepend;
 			});
 		};
-		// @ts-ignore
-    store.addModel(model);
+    store.addModel(model as NamedModel<any>);
     batchManager.addSubsribe(name);
   }
 }
-
-function getStateOrViews(
-	modelName: string,
+function getStateOrViews<S, RM extends ModelCollection, R extends Reducers<S>, E extends Effects<S, R, RM>, V extends Views<S, RM>, Selector extends selectorFn<S, RM, V>>(
+	model: InternalModel<S, RM, R, E, V>,
 	store: Store,
-	selector?: (state: any, views: any) => any
+	selector?: Selector
 ) {
-	const modelState = store.getState()[modelName];
+  const name = model.name;
+	const modelState = store.getState()[name];
 	if (!selector) {
-		return modelState;
+		return modelState as S;
 	}
-	const ModelViews = store.views[modelName] || {};
-	return selector(modelState, ModelViews);
+	const ModelViews = store.views[name] || {};
+  // @ts-ignore
+	return selector(modelState, ModelViews) as unknown as ReturnType<Selector>;
 }
 
-function getStateDispatch(
-  name: string,
+function tuplify<T extends any[]>(...elements: T){
+  return elements;
+}
+
+function getStateDispatch<S, RM extends ModelCollection, R extends Reducers<S>, E extends Effects<S, R, RM>, V extends Views<S, RM>, Selector extends selectorFn<S, RM, V>>(
+  model: InternalModel<S, RM, R, E, V>,
   store: Store,
-  selector?: selector
+  selector?: Selector
 ) {
   const dispatch = store.dispatch;
-  return [
-    getStateOrViews(name, store, selector),
-    dispatch[name]
-  ] as [any, any];
+  const name = model.name;
+  return tuplify(
+    getStateOrViews(model, store, selector),
+    dispatch[name] as DispatchOfModelByProps<S, R, E>
+  );
 }
 
 const createContainer = (config: Config) => {
@@ -120,9 +121,8 @@ const createContainer = (config: Config) => {
     (
       store: Store,
       batchManager: ReturnType<typeof createBatchManager>,
-    ): IUseModel =>
-    //@ts-ignore
-    (model, selector) => {
+    ) =>
+    <S, RM extends ModelCollection, R extends Reducers<S>, E extends Effects<S, R, RM>, V extends Views<S, RM>, Selector extends selectorFn<S, RM, V>>(model: InternalModel<S, RM, R, E, V>, selector?: Selector) => {
 			validate(() => [
 				[
 					!Boolean(model.name),
@@ -130,13 +130,10 @@ const createContainer = (config: Config) => {
 				],
 			])
       const name = model.name || '';
-      const initialValue = useMemo((): [
-        any,
-        Record<string, (...args: any[]) => void>
-      ] => {
+      const initialValue = useMemo(() => {
         initModel(model, store, batchManager);
-        return getStateDispatch(name, store, selector);
-      }, [model, name, selector]);
+        return getStateDispatch(model, store, selector);
+      }, [model, selector]);
 
       const [modelValue, setModelValue] = useState(initialValue);
 
@@ -145,7 +142,7 @@ const createContainer = (config: Config) => {
       useEffect(() => {
         const fn = () => {
           const newValue = getStateDispatch(
-            name,
+            model,
             store,
             selector
           );
@@ -164,7 +161,7 @@ const createContainer = (config: Config) => {
       return modelValue;
     };
 
-  const useModel: IUseModel = (model, selector?) => {
+  const useModel: IUseModel = <S, RM extends ModelCollection, R extends Reducers<S>, E extends Effects<S, R, RM>, V extends Views<S, RM>, Selector extends selectorFn<S, RM, V>>(model: InternalModel<S, RM, R, E, V>, selector?: Selector) => {
 
     const context = useContext(Context);
 
@@ -182,11 +179,11 @@ const createContainer = (config: Config) => {
 
     return useMemo(
       () => createUseModel(store, batchManager),
-      [store]
+      [store, batchManager]
     )(model, selector);
   };
 
-  const useStaticModel: IUseModel = (model, selector?) => {
+  const useStaticModel: IUseModel = <S, RM extends ModelCollection, R extends Reducers<S>, E extends Effects<S, R, RM>, V extends Views<S, RM>, Selector extends selectorFn<S, RM, V>>(model: InternalModel<S, RM, R, E, V>, selector?: Selector) => {
     const context = useContext(Context);
 
 		validate(() => [
@@ -204,8 +201,8 @@ const createContainer = (config: Config) => {
     const name = model.name || '';
     const initialValue = useMemo(() => {
       initModel(model, store, batchManager);
-      return getStateDispatch(name, store, selector);
-    }, [model, name]);
+      return getStateDispatch(model, store, selector);
+    }, [model, selector]);
 
     const value = useRef<[any, any]>([
       // deep clone state in case mutate origin state accidentlly.
@@ -215,7 +212,7 @@ const createContainer = (config: Config) => {
 
     useEffect(() => {
       const fn = () => {
-        const newValue = getStateDispatch(name, store, selector);
+        const newValue = getStateDispatch(model, store, selector);
         if (
           Object.prototype.toString.call(value.current[0]) === '[object Object]'
         ) {
@@ -234,7 +231,7 @@ const createContainer = (config: Config) => {
     return value.current;
   };
 
-  const useLocalModel: IUseModel = (model, selector?) => {
+  const useLocalModel: IUseModel = <S, RM extends ModelCollection, R extends Reducers<S>, E extends Effects<S, R, RM>, V extends Views<S, RM>, Selector extends selectorFn<S, RM, V>>(model: InternalModel<S, RM, R, E, V>, selector?: Selector) => {
     const [store, batchManager] = useMemo(() => {
       const newStore = init(getFinalConfig());
       return [newStore, createBatchManager()];

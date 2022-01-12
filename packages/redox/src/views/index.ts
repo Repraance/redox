@@ -20,6 +20,8 @@ interface ICompare {
 interface IViewsCompare {
   new: Map<string, any>
 	isCollectionKeys: boolean
+  stateCompare: ICompare
+  rootStateCompare: ICompare
 }
 
 let isCollectionKeys = false;
@@ -38,6 +40,10 @@ const getProxyHandler = (viewsCompare: IViewsCompare) => {
 				if (!viewsCompare.new.has(prop)) {
 					viewsCompare.new.set(prop, result);
 				}
+        // if child views fn call, go on collects current scope used keys
+        isCollectionKeys = true;
+        compareStatePos = viewsCompare.stateCompare
+        compareRootStatePos= viewsCompare.rootStateCompare
 			}
       return result;
     }
@@ -171,6 +177,8 @@ function cacheFactory(
     new: new Map<string, any>(),
 		viewsProxy: {},
 		isCollectionKeys: false,
+		stateCompare,
+		rootStateCompare,
 		// name: `${_modelName}-${_viewsKey}`
   };
 

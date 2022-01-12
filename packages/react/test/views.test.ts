@@ -161,7 +161,43 @@ describe('views:', () => {
 		expect(viewsValue).toBe('dz');
 	})
 	test('works with views self', () => {
-		let firstComputeTimes = 0;
+		let firstViewComputeTimes = 0;
+		let firstCViewComputeTimes = 0;
+		const second = defineModel({
+			name: 'second',
+			state: {
+				second_Object:{
+					second_a:{
+						arr: [1,2,3]
+					},
+					second_b:{
+						number: 1
+					}
+				}
+			},
+			reducers: {
+				changedB(state){
+					return {
+						second_Object:{
+							second_a: state.second_Object.second_a,
+							second_b: {
+								number: 2
+							}
+						}
+					}
+				},
+				changedArr(state){
+					return {
+						second_Object:{
+							second_a: {
+								arr: [2,3,4]
+							},
+							second_b: state.second_Object.second_b
+						}
+					}
+				},
+			},
+		});
 		const first = defineModel({
 			name: 'first',
 			state: {
@@ -189,38 +225,64 @@ describe('views:', () => {
 				first_b_view (state){
 					return state.first_b.number
 				},
-				first_c_view (){
-					return this.first_b_view * 2
+				first_c_view (state, dependsState): number{
+					firstCViewComputeTimes+=1
+					const first_b_view = this.first_b_view;
+					const number = state.first_b.number;
+					const first_a_view = this.first_a_view;
+					const second = dependsState.second.second_Object.second_b.number;
+					return first_b_view + number + first_a_view + second
 				},
-				//@ts-ignore
-				first_view (){
-					firstComputeTimes+=1
-					//@ts-ignore
+				first_view (): number{
+					firstViewComputeTimes+=1
 					return this.first_a_view + this.first_c_view
 				}
 			}
-		});
+		}, { second });
 
 		const store = init();
 		let viewsValue;
 		//@ts-ignore
+		store.addModel(second);
+		//@ts-ignore
 		store.addModel(first);
 
-		expect(firstComputeTimes).toBe(0);
+		expect(firstViewComputeTimes).toBe(0);
+		expect(firstCViewComputeTimes).toBe(0);
 
 		viewsValue = store.views.first.first_view();
-		expect(viewsValue).toBe(3);
-		expect(firstComputeTimes).toBe(1);
+		store.views.first.first_c_view()
+		expect(viewsValue).toBe(5);
+		expect(firstViewComputeTimes).toBe(1);
+		expect(firstCViewComputeTimes).toBe(1);
 
 		viewsValue = store.views.first.first_view();
-		expect(viewsValue).toBe(3);
-		expect(firstComputeTimes).toBe(1);
+		store.views.first.first_c_view()
+		expect(viewsValue).toBe(5);
+		expect(firstViewComputeTimes).toBe(1);
+		expect(firstCViewComputeTimes).toBe(1);
 
 		store.dispatch.first.changedNumber();
 
 		viewsValue = store.views.first.first_view();
-		expect(viewsValue).toBe(5);
-		expect(firstComputeTimes).toBe(2);
+		expect(viewsValue).toBe(7);
+		expect(firstViewComputeTimes).toBe(2);
+		expect(firstCViewComputeTimes).toBe(2);
+
+		store.dispatch.second.changedB();
+
+		viewsValue = store.views.first.first_view();
+		expect(viewsValue).toBe(8);
+		expect(firstViewComputeTimes).toBe(3);
+		expect(firstCViewComputeTimes).toBe(3);
+
+
+		store.dispatch.second.changedArr();
+
+		viewsValue = store.views.first.first_view();
+		expect(viewsValue).toBe(8);
+		expect(firstViewComputeTimes).toBe(3);
+		expect(firstCViewComputeTimes).toBe(3);
 
 	})
 	test('works with immer', () => {
