@@ -20,9 +20,10 @@ export type Effects<S, R extends Reducers<S>, RM extends ModelCollection> = {
 	[x: string]: Effect<S, R, RM>;
 };
 
-export type Reducer<S extends State, Payload = any> = (
+export type Reducer<S extends State, Payload = any, Meta = any> = (
 	state: S,
-	payload: Payload
+	payload: Action<Payload>['payload'],
+	meta: Action<Meta>['meta']
 ) => S;
 
 export type Reducers<S> = {
@@ -41,7 +42,7 @@ export type Views<S extends State, RM extends ModelCollection> = {
 
 /**
  * @template S State
- * @template RM RootModel
+ * @template DM dependency models
  */
 export type Model<
 	S,
@@ -54,7 +55,7 @@ export type Model<
 		state: S;
 		reducers?: R;
 		effects?: E & ThisType<DispatchOfModelByProps<S, R, E>>
-		views?: V & ThisType<ViewsObj<V>>;
+		views?: V & ThisType<ViewsObj<V>>
 		subscribe?: (payload: Action) => any
 	};
 
@@ -99,7 +100,7 @@ export type DispatchOfModel<M extends InternalModel<any, any, any, any, any>> = 
 
 export type DispatchOfModelByProps<S, R, E> = DispatcherOfReducers<S, R> & DispatcherOfEffects<E>
 
-type ViewsObj<V> = V extends {[X: string]: (...args: any[])=> any} ? {[K in keyof V]: ReturnType<V[K]>} : {}
+type ViewsObj<V> = V extends Views<any, any> ? {[K in keyof V]: ReturnType<V[K]>} : {}
 
 /**
 * Matches an effect to different forms and based on the form, selects an

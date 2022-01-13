@@ -85,7 +85,6 @@ describe('test createGlobalStore', () => {
     );
 
     const SubApp = () => {
-			// @ts-ignore
 			const [state, dispatch] = useLModel(countModel);
 
       return (
